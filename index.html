@@ -320,48 +320,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
 /* ── MOBILE RESPONSIVENESS ── */
-@media(max-width: 768px) {
-    /* Stack the header elements */
-    .header { padding: 10px; gap: 8px; flex-wrap: wrap; }
-    .logo { font-size: 0.9rem; }
-    .header-right { width: 100%; justify-content: space-between; order: 2; }
+@media(max-width:700px){
 
-    /* The Sidebar Drawer */
-    .sidebar {
-        position: fixed;
-        left: -230px; /* Hide off-screen */
-        top: 0;
-        bottom: 0;
-        z-index: 1000;
-        transition: left 0.3s ease;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-    }
-    .sidebar.open { left: 0; }
+  .sidebar{display:none;}
 
-    /* Overlay when sidebar is open */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.7);
-        z-index: 999;
-    }
-    .sidebar-overlay.show { display: block; }
+  #quizView,#statsView{padding:16px;}
 
-    /* Quiz Adjustments */
-    #quizView { padding: 15px; }
-    .q-text { font-size: 1rem; }
-    .option { padding: 10px; font-size: 0.85rem; }
-    .actions { flex-wrap: wrap; gap: 15px; }
-    .jump-wrap { width: 100%; justify-content: center; order: 3; }
+  .topic-row{grid-template-columns:1fr 50px 50px 80px;}
 
-    /* Stats Table: Hide less important columns */
-    .topic-row { 
-        grid-template-columns: 1fr 50px 80px; /* Topic, Tot, Progress */
-    }
-    .topic-row span:nth-child(3), 
-    .topic-row span:nth-child(4), 
-    .topic-row span:nth-child(5) { display: none; }
 }
 </style>
 </head>
@@ -432,12 +398,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <button class="sign-out-btn" onclick="handleSignOut()">Sign out</button>
     </div>
-       <div class="header">
-    <!-- ADD THIS BUTTON -->
-    <button id="mobileMenuBtn" class="btn" style="padding: 5px 10px; display: none;">☰ Topics</button>
-    
-    <div class="logo">ADRENALINE <span>OBG</span></div>
-    ...
   </div>
 
   <div class="shell">
@@ -737,10 +697,6 @@ async function onUserLoggedIn(user) {
   buildSidebar();
   renderQuestion();
   updateSidebarProgress();
-     // Inside your <script> tag, add this to handle mobile menu
-document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('open');
-    // Also toggle an overlay if you created one
 });
 
 // Close sidebar when a topic is clicked on mobile
