@@ -36,7 +36,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
   import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-
+  
   const firebaseConfig = {
     apiKey: "AIzaSyCsEuzMMJcD6is3kwB0qkmWV09EJpRvBew",
     authDomain: "paper-2-2920a.firebaseapp.com",
@@ -51,7 +51,26 @@
 
   window._fbAuth = auth;
 
-  console.log("Firebase Auth Loaded:", auth); // <-- IMPORTANT
+  console.log("Firebase Auth Loaded:", auth);
+
+  // --- ADD THIS OBSERVER START ---
+  const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js");
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log("👤 User detected:", user.email);
+      await onUserLoggedIn({
+        uid: user.uid,
+        displayName: user.displayName || user.email?.split('@')[0] || 'User',
+        email: user.email,
+        isAnon: user.isAnonymous
+      });
+    } else {
+      console.log("👋 No user signed in.");
+      document.getElementById('appRoot').style.display = 'none';
+      document.getElementById('authScreen').style.display = 'flex';
+    }
+  });
+  // --- ADD THIS OBSERVER END --- // <-- IMPORTANT
 </script>
 
 
@@ -496,17 +515,28 @@ async function firebaseSignOut() {
 // ════════════════════════════════════════════════════════════════════
 
 async function saveProgressToFirebase(uid, data) {
-  // 🔥 REPLACE THIS BODY:
-  // const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-  // await setDoc(doc(window._fbDb, 'users', uid, 'progress', 'main'), data);
+  if (!uid) return;
+  const { getFirestore, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
+  const db = getFirestore();
+  try {
+    await setDoc(doc(db, 'users', uid), data, { merge: true });
+    console.log("💾 Progress saved to Firebase");
+  } catch (e) {
+    console.error("Firestore Save Error:", e);
+  }
 }
 
 async function loadProgressFromFirebase(uid) {
-  // 🔥 REPLACE THIS BODY:
-  // const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-  // const snap = await getDoc(doc(window._fbDb, 'users', uid, 'progress', 'main'));
-  // return snap.exists() ? snap.data() : null;
-  return null;
+  if (!uid) return null;
+  const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
+  const db = getFirestore();
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.exists() ? snap.data() : null;
+  } catch (e) {
+    console.error("Firestore Load Error:", e);
+    return null;
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════
